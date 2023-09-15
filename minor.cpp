@@ -1,5 +1,4 @@
-// C++ program for connecting to database (and error handling)
-		 // main SQLAPI++ header
+
 #include<iostream>
 #include<bits/stdc++.h>
 #include<string.h>
