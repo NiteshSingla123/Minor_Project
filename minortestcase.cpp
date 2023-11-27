@@ -296,9 +296,11 @@ int main()
             break;
         }
 
-        case 2:
-        {
-            cout << "Are you a new user? (1 for Yes / 0 for No): ";
+        // ... (previous code)
+
+case 2:
+{
+    cout << "Are you a new user? (1 for Yes / 0 for No): ";
             int newUser;
             cin >> newUser;
 
@@ -328,45 +330,57 @@ int main()
                 cout << "Invalid username or password." << endl;
             }
 
-            // ... rest of the existing code
-            int availableRides = 0;
-            for (int i = 0; i < d; i++)
-            {
-                if (P[p].nop <= D[i].nos)
-                {
-                    availableRides++;
-                    cout << "Ride " << availableRides << ":" << endl;
-                    D[i].display();
-                }
-            }
+    int availableRides = 0;
 
-            if (availableRides > 1)
-            {
-                cout << "Enter the number of the ride you want to book: ";
-                int rideChoice;
-                cin >> rideChoice;
+   
 
-                if (rideChoice >= 1 && rideChoice <= availableRides)
-                {
-                    confirmchoice = rideChoice;
-                }
-                else
-                {
-                    cout << "Invalid ride choice. Booking not confirmed." << endl;
-                    confirmchoice = 0;
-                }
-            }
-            else if (availableRides == 1)
-            {
-                confirmchoice = 1;
-            }
-            else
-            {
-                confirmchoice = 0;
-            }
-
-            break;
+// Loop through drivers and check for matching origin and destination
+for (int i = 0; i < d; i++)
+{
+    // Check if the driver's origin and destination match the passenger's input
+    if (P[p].origin == D[i].origin && P[p].destination == D[i].destination && D[i].nos != 0)
+    {
+        // Check if there are enough seats available
+        if (P[p].nop <= D[i].nos)
+        {
+            availableRides++;
+            cout << "Ride " << availableRides << ":" << endl;
+            D[i].display();
         }
+    }
+}
+
+// Display a message if no rides are available on the specified route
+if (availableRides == 0)
+{
+    cout << "No rides available on the specified route between "
+         << P[p].origin << " and " << P[p].destination << "." << endl;
+}
+else
+{
+    cout << "Enter the number of the ride you want to book: ";
+    int rideChoice;
+    cin >> rideChoice;
+
+    if (rideChoice >= 1 && rideChoice <= availableRides)
+    {
+        // Update confirmchoice to the index of the selected ride
+        confirmchoice = rideChoice;
+    }
+    else
+    {
+        cout << "Invalid ride choice. Booking not confirmed." << endl;
+        confirmchoice = 0;
+    }
+}
+
+
+    break;
+}
+
+
+
+
 
         case 3:
         {
