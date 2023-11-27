@@ -24,8 +24,7 @@ public:
 
         if (outFile.is_open())
         {
-            outFile << username << "," << password << endl;
-
+            outFile << username << " " << password << endl;
             outFile.close();
         }
         else
@@ -61,11 +60,10 @@ class Driver : public User
 {
 public:
     // Existing driver class code...
-     string name, cno;
+    string name, cno;
     long long int ano;
     int nos, age, price;
     string origin, destination;
-    int stdr, destdr;
 
     void input()
     {
@@ -113,8 +111,8 @@ public:
 
         if (outFile.is_open())
         {
-            outFile << name << "," << age << "," << ano << "," << cno << "," << origin << "," << destination
-                    << "," << nos << "," << price << "," << stdr << "," << destdr << endl;
+            outFile << username << " " << password << " " << name << " " << age << " " << ano << " " << cno << " " << origin << " " << destination
+                    << " " << nos << " " << price << endl;
 
             outFile.close();
         }
@@ -131,7 +129,17 @@ public:
 
         if (inFile.is_open())
         {
-            inFile >> name >> age >> ano >> cno >> origin >> destination >> nos >> price >> stdr >> destdr;
+            string storedUsername, storedPassword;
+            while (inFile >> storedUsername >> storedPassword)
+            {
+                if (storedUsername == username && storedPassword == password)
+                {
+                    // Read the rest of the data
+                    inFile >> name >> age >> ano >> cno >> origin >> destination >> nos >> price;
+                    inFile.close();
+                    return;
+                }
+            }
 
             inFile.close();
         }
@@ -150,7 +158,6 @@ public:
     long long int ano;
     int nop, age, price;
     string origin, destination;
-    int stp, destp;
 
     void input()
     {
@@ -193,8 +200,8 @@ public:
 
         if (outFile.is_open())
         {
-            outFile << pname << "," << age << "," << ano << "," << origin << "," << destination
-                    << "," << nop << "," << stp << "," << destp << endl;
+            outFile << username << " " << password << " " << pname << " " << age << " " << ano << " " << origin << " " << destination
+                    << " " << nop << endl;
 
             outFile.close();
         }
@@ -211,7 +218,17 @@ public:
 
         if (inFile.is_open())
         {
-            inFile >> pname >> age >> ano >> origin >> destination >> nop >> stp >> destp;
+            string storedUsername, storedPassword;
+            while (inFile >> storedUsername >> storedPassword)
+            {
+                if (storedUsername == username && storedPassword == password)
+                {
+                    // Read the rest of the data
+                    inFile >> pname >> age >> ano >> origin >> destination >> nop;
+                    inFile.close();
+                    return;
+                }
+            }
 
             inFile.close();
         }
@@ -226,15 +243,13 @@ int main()
 {
     Driver D[100];
     Passenger P[100];
-    string Loc[] = {"COLLEGE", "PONDA", "NANDA_KI_CHAUKI", "PREMNAGAR", "BALLUPUR", "CLOCK_TOWER", "BUDDHA_CHOCK", "DWARIKA", "SURVEY_CHOCK", "SHASTRADHARA CROSSING", "RING_ROAD"};
     int choice, d = 0, p = 0, confirmchoice;
-    int flag = 0;
 
     cout << ":::<====WELCOME TO THE RIDE SHARE====>:::" << endl;
 
     do
     {
-        confirmchoice = 0, flag = 0;
+        confirmchoice = 0;
 
         cout << "Enter 1 to enter as a DRIVER" << endl;
         cout << "Enter 2 to enter as a PASSENGER" << endl;
@@ -257,26 +272,19 @@ int main()
             if (newUser == 1)
             {
                 D[d].input();
-                // ... rest of the existing code
                 D[d].writeCredentialsToFile("driver_credentials.txt"); // Write driver credentials to file
+                D[d].writeToFile("driver_details.txt");                // Write driver details to file
                 d++;
             }
             else if (newUser == 0 && D[d].checkCredentials("driver_credentials.txt"))
             {
-                // For an old user, ask for name, source, and destination only
-                // ... rest of the existing code
-                for (int i = 0; i < 11; i++)
-                {
-                    if (D[d].origin.compare(Loc[i]) == 0)
-                    {
-                        D[d].stdr = i;
-                    }
-                    if (D[d].destination.compare(Loc[i]) == 0)
-                    {
-                        D[d].destdr = i;
-                    }
-                }
-                
+                // For an old user, ask for new origin and destination only
+                cout << "Enter your new ORIGIN : ";
+                cin >> D[d].origin;
+                transform(D[d].origin.begin(), D[d].origin.end(), D[d].origin.begin(), ::toupper);
+                cout << "Enter your new DESTINATION : ";
+                cin >> D[d].destination;
+                transform(D[d].destination.begin(), D[d].destination.end(), D[d].destination.begin(), ::toupper);
                 D[d].readFromFile("driver_details.txt"); // Read existing data from file
                 d++;
             }
@@ -299,38 +307,19 @@ int main()
             if (newUser == 1)
             {
                 P[p].input();
-                // ... rest of the existing code
-                 for (int i = 0; i < 11; i++)
-                {
-                    if (D[d].origin.compare(Loc[i]) == 0)
-                    {
-                        D[d].stdr = i;
-                    }
-                    if (D[d].destination.compare(Loc[i]) == 0)
-                    {
-                        D[d].destdr = i;
-                    }
-                }
                 P[p].writeCredentialsToFile("passenger_credentials.txt"); // Write passenger credentials to file
+                P[p].writeToFile("passenger_details.txt");                // Write passenger details to file
                 p++;
             }
             else if (newUser == 0 && P[p].checkCredentials("passenger_credentials.txt"))
             {
-                // For an old user, ask for name, source, and destination only
-                // ... rest of the existing code
-                // For an old user, ask for name, source, and destination only
-                cout << "Enter your name: ";
-                cin >> P[p].pname;
-                cout << "Enter your source: ";
+                // For an old user, ask for new origin and destination only
+                cout << "Enter your new ORIGIN : ";
                 cin >> P[p].origin;
                 transform(P[p].origin.begin(), P[p].origin.end(), P[p].origin.begin(), ::toupper);
-                cout << "Enter your destination: ";
+                cout << "Enter your new DESTINATION : ";
                 cin >> P[p].destination;
                 transform(P[p].destination.begin(), P[p].destination.end(), P[p].destination.begin(), ::toupper);
-
-                // Find index of source and destination in Loc array
-                P[p].stp = find(begin(Loc), end(Loc), P[p].origin) - begin(Loc);
-                P[p].destp = find(begin(Loc), end(Loc), P[p].destination) - begin(Loc);
                 P[p].readFromFile("passenger_details.txt"); // Read existing data from file
                 p++;
             }
@@ -340,26 +329,14 @@ int main()
             }
 
             // ... rest of the existing code
-             int availableRides = 0;
+            int availableRides = 0;
             for (int i = 0; i < d; i++)
             {
-                if (P[p].stp > P[p].destp && D[i].stdr > D[i].destdr && D[i].nos != 0)
+                if (P[p].nop <= D[i].nos)
                 {
-                    if (P[p].stp <= D[i].stdr && P[p].destp >= D[i].destdr && P[p].nop <= D[i].nos)
-                    {
-                        availableRides++;
-                        cout << "Ride " << availableRides << ":" << endl;
-                        D[i].display();
-                    }
-                }
-                else if (P[p].stp < P[p].destp && D[i].stdr < D[i].destdr && D[i].nos != 0)
-                {
-                    if (P[p].stp >= D[i].stdr && P[p].destp <= D[i].destdr && P[p].nop <= D[i].nos)
-                    {
-                        availableRides++;
-                        cout << "Ride " << availableRides << ":" << endl;
-                        D[i].display();
-                    }
+                    availableRides++;
+                    cout << "Ride " << availableRides << ":" << endl;
+                    D[i].display();
                 }
             }
 
@@ -388,12 +365,9 @@ int main()
                 confirmchoice = 0;
             }
 
-            
-
             break;
         }
 
-        // ... rest of the existing code
         case 3:
         {
             cout << "Exiting the program..." << endl;
@@ -407,27 +381,22 @@ int main()
         }
         }
 
-        if (choice == 1 || choice == 2)
+        if ((choice == 1 || choice == 2) && confirmchoice != 0)
         {
-            if (confirmchoice != 0)
-            {
-                D[confirmchoice - 1].nos = D[confirmchoice - 1].nos - P[p].nop;
-                cout << "************************************************" << endl;
-                cout << "YOUR RIDE WITH " << D[confirmchoice - 1].name << " HAS BEEN CONFIRMED" << endl;
-                cout << "THANK YOU FOR USING RIDESHARE. HAVE A SAFE JOURNEY" << endl;
-                cout << "                 DO VISIT AGAIN                 " << endl;
-                cout << "************************************************" << endl;
-            }
-            else
-            {
-                cout << "************************************************" << endl;
-                cout << "         THANK YOU FOR USING RIDESHARE.          " << endl;
-                cout << "                 DO VISIT AGAIN                 " << endl;
-                cout << "************************************************" << endl;
-            }
+            D[confirmchoice - 1].nos = D[confirmchoice - 1].nos - P[p].nop;
+            cout << "************************************************" << endl;
+            cout << "YOUR RIDE WITH " << D[confirmchoice - 1].name << " HAS BEEN CONFIRMED" << endl;
+            cout << "THANK YOU FOR USING RIDESHARE. HAVE A SAFE JOURNEY" << endl;
+            cout << "                 DO VISIT AGAIN                 " << endl;
+            cout << "************************************************" << endl;
         }
-
-         // end switch
+        else if (choice == 1 || choice == 2)
+        {
+            cout << "************************************************" << endl;
+            cout << "         THANK YOU FOR USING RIDESHARE.          " << endl;
+            cout << "                 DO VISIT AGAIN                 " << endl;
+            cout << "************************************************" << endl;
+        }
 
     } while (choice != 3);
 
