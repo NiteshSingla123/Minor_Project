@@ -4,10 +4,64 @@
 #include <algorithm>
 using namespace std;
 
-class Driver
+class User
 {
 public:
-    string name, cno;
+    string username, password;
+
+    void inputCredentials()
+    {
+        cout << "Enter your username: ";
+        cin >> username;
+        cout << "Enter your password: ";
+        cin >> password;
+    }
+
+    // New method for writing login credentials to a file
+    void writeCredentialsToFile(const string &fileName)
+    {
+        ofstream outFile(fileName, ios::app); // Open file in append mode
+
+        if (outFile.is_open())
+        {
+            outFile << username << "," << password << endl;
+
+            outFile.close();
+        }
+        else
+        {
+            cout << "Error opening file for writing: " << fileName << endl;
+        }
+    }
+
+    // New method for checking if credentials exist in a file
+    bool checkCredentials(const string &fileName)
+    {
+        ifstream inFile(fileName);
+
+        if (inFile.is_open())
+        {
+            string storedUsername, storedPassword;
+            while (inFile >> storedUsername >> storedPassword)
+            {
+                if (storedUsername == username && storedPassword == password)
+                {
+                    inFile.close();
+                    return true;
+                }
+            }
+
+            inFile.close();
+        }
+        return false;
+    }
+};
+
+class Driver : public User
+{
+public:
+    // Existing driver class code...
+     string name, cno;
     long long int ano;
     int nos, age, price;
     string origin, destination;
@@ -88,9 +142,10 @@ public:
     }
 };
 
-class Passenger
+class Passenger : public User
 {
 public:
+    // Existing passenger class code...
     string pname;
     long long int ano;
     int nop, age, price;
@@ -197,9 +252,19 @@ int main()
             int newUser;
             cin >> newUser;
 
+            D[d].inputCredentials(); // Get username and password
+
             if (newUser == 1)
             {
                 D[d].input();
+                // ... rest of the existing code
+                D[d].writeCredentialsToFile("driver_credentials.txt"); // Write driver credentials to file
+                d++;
+            }
+            else if (newUser == 0 && D[d].checkCredentials("driver_credentials.txt"))
+            {
+                // For an old user, ask for name, source, and destination only
+                // ... rest of the existing code
                 for (int i = 0; i < 11; i++)
                 {
                     if (D[d].origin.compare(Loc[i]) == 0)
@@ -211,28 +276,13 @@ int main()
                         D[d].destdr = i;
                     }
                 }
-                D[d].writeToFile("driver_details.txt"); // Write driver details to file
+                
+                D[d].readFromFile("driver_details.txt"); // Read existing data from file
                 d++;
             }
-            else if (newUser == 0)
+            else
             {
-                // For an old user, ask for name, source, and destination only
-                cout << "Enter your name: ";
-                cin >> D[d].name;
-                cout << "Enter your source: ";
-                cin >> D[d].origin;
-                transform(D[d].origin.begin(), D[d].origin.end(), D[d].origin.begin(), ::toupper);
-                cout << "Enter your destination: ";
-                cin >> D[d].destination;
-                transform(D[d].destination.begin(), D[d].destination.end(), D[d].destination.begin(), ::toupper);
-
-                // Find index of source and destination in Loc array
-                D[d].stdr = find(begin(Loc), end(Loc), D[d].origin) - begin(Loc);
-                D[d].destdr = find(begin(Loc), end(Loc), D[d].destination) - begin(Loc);
-
-                D[d].readFromFile("driver_details.txt"); // Read existing data from file
-
-                d++;
+                cout << "Invalid username or password." << endl;
             }
 
             break;
@@ -244,25 +294,30 @@ int main()
             int newUser;
             cin >> newUser;
 
+            P[p].inputCredentials(); // Get username and password
+
             if (newUser == 1)
             {
                 P[p].input();
-                for (int i = 0; i < 11; i++)
+                // ... rest of the existing code
+                 for (int i = 0; i < 11; i++)
                 {
-                    if (P[p].origin.compare(Loc[i]) == 0)
+                    if (D[d].origin.compare(Loc[i]) == 0)
                     {
-                        P[p].stp = i;
+                        D[d].stdr = i;
                     }
-                    if (P[p].destination.compare(Loc[i]) == 0)
+                    if (D[d].destination.compare(Loc[i]) == 0)
                     {
-                        P[p].destp = i;
+                        D[d].destdr = i;
                     }
                 }
-                P[p].writeToFile("passenger_details.txt"); // Write passenger details to file
+                P[p].writeCredentialsToFile("passenger_credentials.txt"); // Write passenger credentials to file
                 p++;
             }
-            else if (newUser == 0)
+            else if (newUser == 0 && P[p].checkCredentials("passenger_credentials.txt"))
             {
+                // For an old user, ask for name, source, and destination only
+                // ... rest of the existing code
                 // For an old user, ask for name, source, and destination only
                 cout << "Enter your name: ";
                 cin >> P[p].pname;
@@ -276,15 +331,16 @@ int main()
                 // Find index of source and destination in Loc array
                 P[p].stp = find(begin(Loc), end(Loc), P[p].origin) - begin(Loc);
                 P[p].destp = find(begin(Loc), end(Loc), P[p].destination) - begin(Loc);
-
                 P[p].readFromFile("passenger_details.txt"); // Read existing data from file
-
                 p++;
             }
+            else
+            {
+                cout << "Invalid username or password." << endl;
+            }
 
-            // Check if multiple rides are available for the passenger
-            // If yes, prompt the passenger to choose which ride to book
-            int availableRides = 0;
+            // ... rest of the existing code
+             int availableRides = 0;
             for (int i = 0; i < d; i++)
             {
                 if (P[p].stp > P[p].destp && D[i].stdr > D[i].destdr && D[i].nos != 0)
@@ -332,9 +388,12 @@ int main()
                 confirmchoice = 0;
             }
 
+            
+
             break;
         }
 
+        // ... rest of the existing code
         case 3:
         {
             cout << "Exiting the program..." << endl;
@@ -367,6 +426,8 @@ int main()
                 cout << "************************************************" << endl;
             }
         }
+
+         // end switch
 
     } while (choice != 3);
 
