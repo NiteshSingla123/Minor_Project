@@ -1,0 +1,317 @@
+#include<iostream>
+#include<fstream>
+#include<string>
+#include<algorithm>
+#include<climits>
+
+using namespace std;
+
+string Loc[] = {"COLLEDGE", "PONDA", "NANDA_KI_CHAUKI", "PREMNAGAR", "BALLUPUR", "CLOCK_TOWER", "BUDDHA_CHOCK", "DWARIKA", "SURVEY_CHOCK", "SHASTRADHARA CROSSING", "RING_ROAD"};
+
+class User {
+public:
+    string username, password;
+
+    void inputCredentials() {
+        cout << "Enter your username: ";
+        cin >> username;
+        cout << "Enter your password: ";
+        cin >> password;
+    }
+
+    bool verifyCredentials(string filename) {
+        ifstream file(filename);
+        string line;
+        while (getline(file, line)) {
+            if (line.find(username) != string::npos && line.find(password) != string::npos) {
+                file.close();
+                return true; // Credentials are correct
+            }
+        }
+        file.close();
+        return false; // Incorrect credentials
+    }
+
+    bool isNewUser(string filename) {
+        ifstream file(filename);
+        string line;
+        while (getline(file, line)) {
+            if (line.find(username) != string::npos) {
+                file.close();
+                return false; // User already exists
+            }
+        }
+        file.close();
+        return true; // New user
+    }
+};
+
+class Driver : public User {
+public:
+    string name, cno, origin, destination;
+    long long int ano;
+    int nos, age, price, stdr, destdr;
+
+    void input() {
+        if (!isNewUser("userdata.txt")) {
+            cout << "Welcome back, " << username << "!\n";
+            return; // Existing user, no need to input again
+        }
+
+        User::inputCredentials();
+        
+        if (!verifyCredentials("userdata.txt")) {
+            cout << "Incorrect username or password. Exiting...\n";
+            return; // Incorrect credentials
+        }
+
+        // Additional details only for new users
+        cout << "Enter the required details...\n";
+        cout << "NAME : ";
+        cin.ignore(); // Clear input buffer
+        getline(cin, name);
+        cout << "AGE : ";
+        cin >> age;
+        cout << "AADHAR CARD NUMBER : ";
+        cin >> ano;
+        cout << "CAR NUMBER : ";
+        cin.ignore(); // Clear input buffer
+        getline(cin, cno);
+        cout << "ORIGIN : ";
+        cin >> origin;
+        transform(origin.begin(), origin.end(), origin.begin(), ::toupper);
+        cout << "DESTINATION : ";
+        cin >> destination;
+        transform(destination.begin(), destination.end(), destination.begin(), ::toupper);
+        cout << "SEATS AVAILABLE : ";
+        cin >> nos;
+        cout << "PRICE (per Km) : ";
+        cin >> price;
+        cout << "\n************************************************\n";
+
+        for (int i = 0; i < 11; i++) {
+            if (origin.compare(Loc[i]) == 0) {
+                stdr = i;
+            }
+            if (destination.compare(Loc[i]) == 0) {
+                destdr = i;
+            }
+        }
+
+        ofstream file("userdata.txt", ios::app); // Open file in append mode
+        file << "DRIVER\n";
+        file << username << " " << password << "\n";
+        file << name << " " << age << " " << ano << " " << cno << " " << origin << " " << destination << " " << nos << " " << price << "\n";
+        file.close();
+    }
+
+    void display() {
+        // Details displayed
+        cout << "NAME : " << name << endl;
+        cout << "AGE : " << age << endl;
+        cout << "ORIGIN : " << origin << endl;
+        cout << "DESTINATION : " << destination << endl;
+        cout << "AVAILABLE SEATS : " << nos << endl;
+        cout << "PRICE (per Km) : " << price << endl;
+        cout << "\n************************************************\n";
+    }
+};
+
+class Passenger : public User {
+public:
+    string pname, origin, destination;
+    long long int ano;
+    int nop, age, stp, destp;
+
+    void input() {
+        if (!isNewUser("userdata.txt")) {
+            cout << "Welcome back, " << username << "!\n";
+            return; // Existing user, no need to input again
+        }
+
+        User::inputCredentials();
+
+        if (!verifyCredentials("userdata.txt")) {
+            cout << "Incorrect username or password. Exiting...\n";
+            return; // Incorrect credentials
+        }
+
+        // Additional details only for new users
+        cout << "Enter the required details...\n";
+        cout << "NAME : ";
+        cin.ignore(); // Clear input buffer
+        getline(cin, pname);
+        cout << "AGE : ";
+        cin >> age;
+        cout << "AADHAR CARD NUMBER : ";
+        cin >> ano;
+        cout << "ORIGIN : ";
+        cin >> origin;
+        transform(origin.begin(), origin.end(), origin.begin(), ::toupper);
+        cout << "DESTINATION : ";
+        cin >> destination;
+        transform(destination.begin(), destination.end(), destination.begin(), ::toupper);
+        cout << "TOTAL PASSENGERS : ";
+        cin >> nop;
+        cout << "\n*************************************************\n";
+
+        for (int i = 0; i < 11; i++) {
+            if (origin.compare(Loc[i]) == 0) {
+                stp = i;
+            }
+            if (destination.compare(Loc[i]) == 0) {
+                destp = i;
+            }
+        }
+
+        ofstream file("userdata.txt", ios::app); // Open file in append mode
+        file << "PASSENGER\n";
+        file << username << " " << password << "\n";
+        file << pname << " " << age << " " << ano << " " << origin << " " << destination << " " << nop << "\n";
+        file.close();
+    }
+
+    void display() {
+        cout << "NAME : " << pname << endl;
+        cout << "AGE : " << age << endl;
+        cout << "ORIGIN : " << origin << endl;
+        cout << "DESTINATION : " << destination << endl;
+        cout << "TOTAL PASSENGERS : " << nop << endl;
+        cout << "\n*************************************************\n";
+    }
+};
+
+void saveDataToFile(Driver D[], int d, Passenger P[], int p) {
+    ofstream file("userdata.txt");
+
+    for (int i = 0; i < d; ++i) {
+        file << "DRIVER\n";
+        file << D[i].username << " " << D[i].password << "\n";
+        file << D[i].name << " " << D[i].age << " " << D[i].ano << " " << D[i].cno << " " << D[i].origin << " " << D[i].destination << " " << D[i].nos << " " << D[i].price << "\n";
+    }
+
+    for (int i = 0; i < p; ++i) {
+        file << "PASSENGER\n";
+        file << P[i].username << " " << P[i].password << "\n";
+        file << P[i].pname << " " << P[i].age << " " << P[i].ano << " " << P[i].origin << " " << P[i].destination << " " << P[i].nop << "\n";
+    }
+
+    file.close();
+}
+
+void loadDataFromFile(Driver D[], int &d, Passenger P[], int &p) {
+    ifstream file("userdata.txt");
+
+    while (!file.eof()) {
+        string userType;
+        file >> userType;
+
+        if (userType == "DRIVER") {
+            D[d].inputCredentials();
+            file >> D[d].name >> D[d].age >> D[d].ano >> D[d].cno >> D[d].origin >> D[d].destination >> D[d].nos >> D[d].price;
+            ++d;
+        } else if (userType == "PASSENGER") {
+            P[p].inputCredentials();
+            file >> P[p].pname >> P[p].age >> P[p].ano >> P[p].origin >> P[p].destination >> P[p].nop;
+            ++p;
+        }
+    }
+
+    file.close();
+}
+
+int main() {
+    Driver D[100];
+    Passenger P[100];
+    int choice, d = 0, p = 0, confirmchoice;
+    int flag = 0;
+
+    cout << ":::<====WELCOME TO THE RIDE SHARE====>:::\n";
+
+    START:
+    confirmchoice = 0, flag = 0;
+
+    cout << "Enter 1 to enter as a DRIVER\n";
+    cout << "Enter 2 to enter as a PASSENGER\n";
+    cout << "Enter 3 to EXIT the program\n";
+    cout << "ENTER YOUR CHOICE : ";
+
+    if (!(cin >> choice)) {
+        cin.clear(); // clear input buffer to restore cin to a usable state
+        cin.ignore(INT_MAX, '\n'); // ignore last input
+    }
+
+    cout << "***********************************************\n";
+    cout << "\n";
+
+    switch (choice) {
+        case 1:
+            D[d].input();
+            d++;
+            goto START;
+
+        case 2:
+            P[p].input();
+            break;
+
+        case 3:
+            goto EXIT;
+
+        default:
+            cout << "INVALID CHOICE\n";
+            goto START;
+    }
+
+    cout << "==========> AVAILABLE RIDES <==========\n";
+    if (P[p].stp > P[p].destp) {
+        for (int i = 0; i < d; i++) {
+            if (D[i].stdr > D[i].destdr && D[i].nos != 0) {
+                if (P[p].stp <= D[i].stdr && P[p].destp >= D[i].destdr && P[p].nop <= D[i].nos) {
+                    D[i].display();
+                    cout << "ENTER " << i + 1 << " TO CONFIRM YOUR RIDE WITH " << D[i].name << " OR 0 TO NOT CONFIRM IT\n";
+                    cout << "*************************************************\n";
+                    D[i].display();
+                    flag = 1;
+                }
+            }
+        }
+    } else {
+        if (P[p].stp < P[p].destp) {
+            for (int i = 0; i < d; i++) {
+                if (D[i].stdr < D[i].destdr && D[i].nos != 0) {
+                    if (P[p].stp >= D[i].stdr && P[p].destp <= D[i].destdr && P[p].nop <= D[i].nos) {
+                        D[i].display();
+                        cout << "ENTER " << i + 1 << " TO CONFIRM YOUR RIDE WITH " << D[i].name << " OR 0 TO NOT CONFIRM IT\n";
+                        cout << "*************************************************\n";
+                        flag = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    if (flag == 1) {
+        cin >> confirmchoice;
+        if (confirmchoice != 0) {
+            D[confirmchoice - 1].nos = D[confirmchoice - 1].nos - P[p].nop;
+            cout << "************************************************\n";
+            cout << "YOUR RIDE WITH " << D[confirmchoice - 1].name << " HAS BEEN CONFIRMED\n";
+            cout << "THANK YOU FOR USING RIDESHARE. HAVE A SAFE JOURNEY\n";
+            cout << "                 DO VISIT AGAIN                 \n";
+            cout << "************************************************\n";
+        } else {
+            cout << "************************************************\n";
+            cout << "         THANK YOU FOR USING RIDESHARE.          \n";
+            cout << "                 DO VISIT AGAIN                 \n";
+            cout << "************************************************\n";
+        }
+    } else {
+        cout << "SORRY...!!!!!NO RIDES AVAILABLE\n";
+        cout << "PLEASE TRY AGAIN\n";
+        cout << "*************************************************\n\n";
+    }
+
+    goto START;
+    EXIT:
+    saveDataToFile(D, d, P, p);
+}
